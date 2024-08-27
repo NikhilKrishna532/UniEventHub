@@ -1,15 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export function middleware(req: NextRequest) {
-  const url = req.nextUrl.pathname;
+// Define public routes using createRouteMatcher
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/events/:id',
+  '/api/webhook/clerk',
+  '/api/webhook/stripe',
+  '/api/uploadthing'
+]);
 
-  // Example: Allow access to public routes
-  if (['/', '/events/:id', '/api/webhook/clerk', '/api/webhook/stripe', '/api/uploadthing'].includes(url)) {
-    return NextResponse.next();
+export default clerkMiddleware((auth, request) => {
+  // Protect routes that are not public
+  if (!isPublicRoute(request)) {
+    auth().protect();
   }
-  return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
 };
