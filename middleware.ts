@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  return NextResponse.next();
+  const url = req.nextUrl.pathname;
+
+  // Example: Allow access to public routes
+  if (['/', '/events/:id', '/api/webhook/clerk', '/api/webhook/stripe', '/api/uploadthing'].includes(url)) {
+    return NextResponse.next();
+  }
 }
 
 export const config = {
