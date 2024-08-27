@@ -4,13 +4,12 @@ export function middleware(req: NextRequest) {
   const publicRoutes = ['/', '/events/:id', '/api/webhook/clerk', '/api/webhook/stripe', '/api/uploadthing'];
   const url = req.nextUrl.pathname;
 
-  // Check if the route is public
-  if (publicRoutes.includes(url)) {
+  // Handle public routes
+  if (publicRoutes.includes(url) || publicRoutes.some(route => url.startsWith(route))) {
     return NextResponse.next();
   }
 
-  // Implement custom logic here, e.g., redirect to login if not authenticated
-  // Example: check for an auth token
+  // Handle authentication check or other logic
   const token = req.headers.get('authorization');
   if (!token) {
     return NextResponse.redirect(new URL('/login', req.url));
